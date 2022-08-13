@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env MODE=production node index.js",
-    "test": "cross-env MODE=development nodemon index.js"
+    "test": "cross-env MODE=development nodemon index.js",
+    "dev-database": "(if not exist database mkdir database) && mongod --port 27017 --dbpath ./database"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/khanhtranngoccva/brad-storybooks.git"
+    "url": "git+https://github.com/khanhtranngoccva/BradTraversy-Storybook.git"
   },
   "author": "",
   "license": "ISC",
