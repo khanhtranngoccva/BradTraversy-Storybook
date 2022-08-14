@@ -1,0 +1,13 @@
+.login-container {
+    width: 30rem;
+    margin-block: 2rem;
+    text-align: center;
+}
+
+.loginTitle {
+    font-weight: 600;
+}
+
+.card .card-content .lead {
+    margin-block: 1rem;
+}
