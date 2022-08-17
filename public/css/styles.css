@@ -11,3 +11,7 @@
 .card .card-content .lead {
     margin-block: 1rem;
 }
+
+.storySummary {
+    word-wrap: break-word;
+}

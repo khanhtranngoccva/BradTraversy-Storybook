@@ -15,15 +15,35 @@ passport.use(new GoogleStrategy({
     callbackURL: "/auth/google/callback",
 }, async function (accessToken, refreshToken, profile, done) {
     try {
-        const newUser = {
+        // The user's Google info.
+        const googleInfo = {
             googleId: profile.id,
             displayName: profile.displayName,
             image: profile.photos?.[0]?.value,
+            name: profile.name,
+        };
+        // Defaults.
+        const defaults = {
+            status: "public",
             createdAt: new Date(),
-        }
+        };
+        // Populated at creation.
+        const newUser = {
+            ...googleInfo,
+            ...defaults,
+        };
         let user = await (await userCollection).findOne({googleId: profile.id});
         if (!user) {
             user = await (await userCollection).insertOne(newUser);
+        } else {
+            const updatedUser = Object.assign(defaults, user, googleInfo);
+            console.log(updatedUser);
+            let result = await (await userCollection).findOneAndUpdate({googleId: profile.id}, {
+                // User (lookup from database) has precedence over defaults because we don't want to overwrite the createdAt variable.
+                // googleInfo overrides user object so that the user can update their profile.
+                $set: updatedUser,
+            });
+            user = result.value;
         }
         done(null, user);
     } catch (e) {
@@ -37,14 +57,12 @@ passport.use(new GoogleStrategy({
 
 // This function runs if the user is newly logged in, and
 passport.serializeUser((user, done) => {
-    console.log("Newly logged in");
     done(null, user._id);
 });
 
 // This function runs if the cookie access token can be used to get an ID from the session
 // (that remembers the user logging in), and does not run if  .
 passport.deserializeUser(async (id, done) => {
-    console.log(id);
     let userCol = await userCollection;
     let user, error = null;
     try {

@@ -11,26 +11,42 @@ const cors = require("cors");
 const morgan = require("morgan");
 const expressLayouts = require("express-ejs-layouts");
 const session = require("express-session");
+const methodOverride = require("method-override");
+const MongoStore = require("connect-mongo");
+const ejsHelpers = require("./helpers/ejsHelpers");
 
 module.exports = {app, mongoClient};
 
-app.use(expressLayouts);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use(methodOverride((req, res) => {
+    if (req.body && typeof req.body === "object" && "_method" in req.body) {
+        let method = req.body._method;
+        delete req.body._method;
+        return method;
+    }
+}))
 app.use(cors());
+app.use(expressLayouts);
 
-
+const mongoStore = new MongoStore({
+    client: mongoClient,
+    dbName: "usersDatabase",
+    collectionName: "userSessions",
+});
 
 app.use(session({
     secret: "bongo cat",
     resave: false,
     saveUninitialized: false,
+    store: mongoStore,
 }));
 
 require("./config/passport");
 
 app.set("view engine", "ejs");
+app.locals.helpers = ejsHelpers;
 
 let PORT;
 if (process.env.MODE !== "production") {

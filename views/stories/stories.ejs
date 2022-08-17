@@ -1,0 +1,26 @@
+<h1>Stories</h1>
+<div class="row">
+    <% for (let story of stories) { %>
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-image"></div>
+                <% let editIconResult = helpers.editIcon(story.author, curUser);
+                if (editIconResult) { %>
+                    <a href="/stories/edit/<%=story._id%>" class="btn-floating halfway-fab blue"><i class="fas fa-edit fa-small"></i></a>
+                <% } %>
+                <div class="card-content center-align">
+                    <h3><%= story.title %></h3>
+                    <p class="storySummary"><%= helpers.truncate(helpers.stripTags(story.body), 150) %></p>
+                    <br>
+                    <div class="chip">
+                        <img src="<%= story.author.image %>" alt="">
+                        <a href="/user/<%= story.author._id %>"><%= story.author.displayName %></a>
+                    </div>
+                </div>
+                <div class="card-action center-align">
+                    <a href="/stories/<%= story._id %>">Read More!</a>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>

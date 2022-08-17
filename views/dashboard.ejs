@@ -1,1 +1,32 @@
-<h1>Dashboard</h1>
+<h1>Welcome to StoryBooks, <%= userProfile.name.givenName %>!</h1>
+
+<h2>Your stories</h2>
+
+<% if (storiesCreatedByAuthor.length) { %>
+    <table>
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (let story of storiesCreatedByAuthor) { %>
+            <tr>
+                <td><a href=<%= `/stories/${story._id}` %>><%= story.title %></a></td>
+                <td><%= helpers.formatDate(story.createdAt, "MMMM Do YYYY, h:mm:ss a") %></td>
+                <td><span class="dash-status"><%= helpers.capitalize(story.status) %></span></td>
+                <td><a href="/stories/edit/<%=story._id%>" class="btn blue"><i class="fas fa-edit"></i></a>
+                    <form action="/stories/delete/<%=story._id%>" method="post">
+                        <input hidden name="_method" value="delete">
+                        <button class="btn red"><i class="fas fa-trash"></i></button>
+                    </form></td>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>You haven't written any stories yet!</p>
+<% } %>

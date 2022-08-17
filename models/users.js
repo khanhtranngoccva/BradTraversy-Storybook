@@ -1,4 +1,5 @@
 const mongoClient = require("../config/database");
+const getCollectionWithSchema = require("./collectionWithSchema");
 
 const userSchema = {
     title: "user",
@@ -6,12 +7,25 @@ const userSchema = {
         "_id",
         "googleId",
         "displayName",
+        "name",
+        "status",
     ],
     properties: {
         _id: {bsonType: "objectId"},
         googleId: {bsonType: "string"},
         displayName: {bsonType: "string"},
         image: {bsonType: "string"},
+        name: {bsonType: "object",
+            required: ["familyName", "givenName"],
+            properties: {
+                familyName: {bsonType: "string"},
+                givenName: {bsonType: "string"},
+            }
+        },
+        status: {
+            bsonType: "string",
+            enum: ["private", "public"],
+        },
         createdAt: {bsonType: "date"},
     },
 };
@@ -19,22 +33,4 @@ const userSchema = {
 const userCollectionName = "users";
 
 const db = mongoClient.db("usersDatabase");
-
-async function usersCollection() {
-    try {
-        return await db.createCollection(userCollectionName, {
-            validator: {
-                $jsonSchema: userSchema,
-            }
-        });
-    } catch (e) {
-        await db.command({collMod: userCollectionName}, {
-            validator: {
-                $jsonSchema: userSchema,
-            }
-        });
-        return db.collection(userCollectionName);
-    }
-}
-
-module.exports = usersCollection();
+module.exports = getCollectionWithSchema(db, userCollectionName, userSchema);
